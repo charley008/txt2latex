@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">言式 Logo</title>
+  <desc id="desc">墨绿色圆角方形中，一枚对话气泡包围求和符号，代表自然语言与数学表达。</desc>
+  <rect width="256" height="256" rx="64" fill="#294C3D"/>
+  <path d="M72 57H184C197.255 57 208 67.745 208 81V157C208 170.255 197.255 181 184 181H113L77 207V181H72C58.745 181 48 170.255 48 157V81C48 67.745 58.745 57 72 57Z" stroke="#F3F5E9" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M159 88H103L130 119L103 150H159" stroke="#C2D3A4" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

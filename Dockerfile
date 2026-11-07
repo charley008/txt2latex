@@ -4,6 +4,7 @@ COPY package*.json ./
 RUN npm ci
 COPY index.html vite.config.js ./
 COPY src ./src
+COPY public ./public
 COPY server/latex.js ./server/latex.js
 RUN npm run build
 
