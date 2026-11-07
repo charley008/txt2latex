@@ -5,7 +5,7 @@ export function saveSettings(settings){localStorage.setItem('formula-ai-settings
 export async function getLocalStatus(){
  if(!globalThis.isSecureContext)return '本地 AI 需要 HTTPS 或 localhost';
  if(!globalThis.LanguageModel)return '当前浏览器不支持，请使用支持 Prompt API 的桌面 Chrome 或选择云端 API';
- try{const a=await LanguageModel.availability();return {available:'本地模型已就绪 · 中文效果需核对',downloadable:'首次使用需下载本地模型 · 点击生成开始',downloading:'本地模型正在下载',unavailable:'Chrome 报告模型暂不可用（unavailable），请检查浏览器版本、模型状态与运行条件'}[a]||'本地 AI 状态未知'}catch{return '无法检测本地模型，可选择云端 API'}
+ try{const a=await LanguageModel.availability();return {available:'本地模型已就绪 · 中文效果需核对',downloadable:'Chrome 报告需下载模型资源 · 点击生成开始',downloading:'本地模型正在下载',unavailable:'Chrome 报告模型暂不可用（unavailable），请检查浏览器版本、模型状态与运行条件'}[a]||'本地 AI 状态未知'}catch{return '无法检测本地模型，可选择云端 API'}
 }
 export async function convertLocal(text,preferences,onProgress=()=>{}){
  if(!globalThis.isSecureContext||!globalThis.LanguageModel)throw Error('本地 AI 不可用：请使用 HTTPS/localhost 和支持 Prompt API 的桌面 Chrome，或手动选择「我的云端 API」。');
@@ -13,7 +13,8 @@ export async function convertLocal(text,preferences,onProgress=()=>{}){
  if(state==='unavailable')throw Error('Chrome 返回 unavailable，暂时不能创建本地模型会话。这不一定是硬件不足：请在桌面 Chrome 打开 chrome://on-device-internals 查看模型状态，并确认浏览器版本及磁盘空间。也可手动选择「我的云端 API」。');
  let session;
  try{
-  session=await LanguageModel.create({initialPrompts:[{role:'system',content:systemPrompt}],monitor(m){m.addEventListener('downloadprogress',e=>onProgress(`正在下载本地模型 ${Math.round(e.loaded*100)}%`))}});
+  onProgress(state==='available'?'正在加载已下载的本地模型…':'正在准备本地模型资源…');
+  session=await LanguageModel.create({initialPrompts:[{role:'system',content:systemPrompt}],monitor(m){m.addEventListener('downloadprogress',e=>{if(state!=='available' && e.loaded<1)onProgress(`正在下载本地模型资源 ${Math.round(e.loaded*100)}%`);else onProgress('正在加载本地模型…')})}});
   onProgress('正在使用本地模型转换…');
   return cleanLatex(await session.prompt(JSON.stringify({description:text,formattingPreferences:preferences})));
  }catch(e){throw Error(`本地 AI 转换失败：${e.message}。可手动选择云端 API；未自动上传输入。`)}finally{session?.destroy()}

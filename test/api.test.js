@@ -23,3 +23,8 @@ test('local model lifecycle and unsupported device',async()=>{
 test('removes unsolicited numbered equation wrapper',()=>{assert.equal(cleanLatex(String.raw`\begin{equation}
 x^2+y^2=1
 \end{equation}`),'x^2+y^2=1')});
+
+test('ready model initialization is not labeled as downloading',async()=>{
+ globalThis.isSecureContext=true;globalThis.LanguageModel={availability:async()=> 'available',create:async(opts)=>{opts.monitor({addEventListener:(name,cb)=>cb({loaded:1})});return {prompt:async()=> 'x',destroy(){}}}};
+ try{const progress=[];await convertLocal('x','',p=>progress.push(p));assert.ok(progress.length>0);assert.ok(progress.every(p=>!p.includes('正在下载')))}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
+});
