@@ -123,3 +123,5 @@
 [data-theme="dark"] .hero p,[data-theme="dark"] .section-label,[data-theme="dark"] .engine-bar,[data-theme="dark"] .source-heading,[data-theme="dark"] .modal>p,[data-theme="dark"] .modal small,[data-theme="dark"] .model-badge,[data-theme="dark"] .input-meta,[data-theme="dark"] .output-actions,[data-theme="dark"] footer,[data-theme="dark"] .muted,[data-theme="dark"] .convert-bar>span,[data-theme="dark"] .preview p{color:#c6c6cd}
 
 .convert-bar .primary,[data-theme="dark"] .convert-bar .primary{background:#16803c;color:#fff}.convert-bar .primary:hover,[data-theme="dark"] .convert-bar .primary:hover{background:#126b32}.convert-bar .primary:disabled,[data-theme="dark"] .convert-bar .primary:disabled{background:#16803c;color:#fff;opacity:.6}
+
+.sample-math{font-style:normal}
