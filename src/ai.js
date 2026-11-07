@@ -1,7 +1,6 @@
 import katex from 'katex';
 import {cleanLatex,systemPrompt} from '../server/latex.js';
 import {localSystemPrompt,localRequest} from './local-prompt.js';
-import {translateForLocal} from './translate.js';
 const defaults={baseUrl:'https://api.deepseek.com',model:'deepseek-v4-flash',apiKey:'',remember:false};
 export function readSettings(){try{const d=JSON.parse(localStorage.getItem('formula-ai-settings')||'{}');return {...defaults,baseUrl:typeof d.baseUrl==='string'&&d.baseUrl.trim()?d.baseUrl:defaults.baseUrl,model:typeof d.model==='string'?d.model:defaults.model,apiKey:d.remember===true&&typeof d.apiKey==='string'?d.apiKey:'',remember:d.remember===true}}catch{return {...defaults}}}
 export function saveSettings(settings){localStorage.setItem('formula-ai-settings',JSON.stringify({...settings,apiKey:settings.remember?settings.apiKey:''}));}
@@ -16,12 +15,11 @@ export async function convertLocal(text,preferences,onProgress=()=>{},onTranslat
  if(state==='unavailable')throw Error('Chrome 返回 unavailable，暂时不能创建本地模型会话。这不一定是硬件不足：请在桌面 Chrome 打开 chrome://on-device-internals 查看模型状态，并确认浏览器版本及磁盘空间。也可手动选择「我的云端 API」。');
  let session;
  try{
-  const translated=await translateForLocal(text,preferences,onProgress);
-  onTranslation(translated.text===text&&translated.preferences===preferences?null:translated);
+  onTranslation(null);
   onProgress(state==='available'?'正在加载已下载的本地模型…':'正在准备本地模型资源…');
   session=await LanguageModel.create({initialPrompts:[{role:'system',content:localSystemPrompt}],monitor(m){m.addEventListener('downloadprogress',e=>{if(state!=='available' && e.loaded<1)onProgress(`正在下载本地模型资源 ${Math.round(e.loaded*100)}%`);else onProgress('正在加载本地模型…')})}});
   onProgress('正在使用本地模型转换…');
-  let result=cleanLatex(await session.prompt(localRequest(translated.text,translated.preferences)));
+  let result=cleanLatex(await session.prompt(localRequest(text,preferences)));
   const valid=value=>{try{katex.renderToString(value,{throwOnError:true,trust:false,strict:'ignore',maxExpand:1000});return true}catch{return false}};
   if(!valid(result)){
    onProgress('正在修复公式格式…');

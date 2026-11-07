@@ -72,3 +72,10 @@ test('geometry requests still invoke the local model',async()=>{
  globalThis.LanguageModel={availability:async()=> 'available',create:async()=>({prompt:async(prompt)=>{called=true;assert.ok(prompt.includes('triangle ABC'));return String.raw`\triangle ABC`},destroy(){}})};
  try{assert.equal(await convertLocal('triangle ABC',''),String.raw`\triangle ABC`);assert.equal(called,true)}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
 });
+
+test('local generation sends original Chinese without translation',async()=>{
+ globalThis.isSecureContext=true;let received='';
+ globalThis.LanguageModel={availability:async()=> 'available',create:async()=>({prompt:async(p)=>{received=p;return String.raw`\sqrt{x^2+1}`},destroy(){}})};
+ globalThis.Translator={availability(){throw Error('Translation must not run')}};
+ try{assert.equal(await convertLocal('x² 加 1 的整体平方根',''),String.raw`\sqrt{x^2+1}`);assert.ok(received.includes('x² 加 1 的整体平方根'))}finally{delete globalThis.LanguageModel;delete globalThis.Translator;delete globalThis.isSecureContext}
+});
