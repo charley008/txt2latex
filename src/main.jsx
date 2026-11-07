@@ -18,7 +18,7 @@ function App(){
  const [systemDark,setSystemDark]=useState(()=>window.matchMedia('(prefers-color-scheme: dark)').matches);
  const dark=theme==='system'?systemDark:theme==='dark';
  useEffect(()=>{const query=window.matchMedia('(prefers-color-scheme: dark)');const update=e=>setSystemDark(e.matches);query.addEventListener('change',update);return ()=>query.removeEventListener('change',update)},[]);
- useEffect(()=>{document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#151d19':'#f6f5f1')},[dark]);
+ useEffect(()=>{document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.style.colorScheme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#171719':'#f6f5f1')},[dark]);
  function changeTheme(value){setTheme(value);try{localStorage.setItem('formula-theme',value)}catch{}}
 
  const [text,setText]=useState(''),[latex,setLatex]=useState(''),[mode,setMode]=useState('inline'),[busy,setBusy]=useState(false),[error,setError]=useState(''),[settings,setSettings]=useState(false),[provider,setProvider]=useState('local'),[localStatus,setLocalStatus]=useState('正在检测本地 AI…'),[progress,setProgress]=useState(''),[baseUrl,setBaseUrl]=useState(()=>readSettings().baseUrl),[model,setModel]=useState(()=>readSettings().model),[key,setKey]=useState(()=>readSettings().apiKey),[remember,setRemember]=useState(()=>readSettings().remember),[preferences,setPreferences]=useState(''),[copied,setCopied]=useState(false),[history,setHistory]=useState(()=>{try{return JSON.parse(localStorage.getItem('formula-history')||'[]').slice(0,12)}catch{return []}});

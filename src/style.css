@@ -104,3 +104,20 @@
 
 .engine-bar>span{flex:1 1 280px;min-width:0;text-align:right;line-height:1.7;overflow-wrap:anywhere}
 @media(max-width:620px){.engine-bar>span{flex-basis:100%;text-align:left}}
+
+/* Neutral charcoal surfaces for dark mode. */
+:root[data-theme="dark"]{background:#171719;color:#f2f2f3}
+[data-theme="dark"] header,[data-theme="dark"] footer{border-color:#38383d}
+[data-theme="dark"] .workspace,[data-theme="dark"] .example-grid button,[data-theme="dark"] .history-items button,[data-theme="dark"] .modal{background:#232326;border-color:#414147}
+[data-theme="dark"] .input-pane,[data-theme="dark"] .convert-bar,[data-theme="dark"] .source-heading,[data-theme="dark"] .source-pane{border-color:#3a3a40}
+[data-theme="dark"] .source,[data-theme="dark"] .modal input,[data-theme="dark"] .modal textarea{background:#1c1c1f;border-color:#46464e}
+[data-theme="dark"] select,[data-theme="dark"] .example-icon,[data-theme="dark"] .local-model-card,[data-theme="dark"] .modal input[readonly]{background:#303034;border-color:#4a4a51}
+[data-theme="dark"] .outline,[data-theme="dark"] .step{border-color:#505057}
+[data-theme="dark"] .outline:hover,[data-theme="dark"] .icon-button:hover{background:#36363c}
+[data-theme="dark"] .preview{background-image:radial-gradient(#44444a .7px,transparent .7px)}
+[data-theme="dark"] .workspace-resizer{background:#2c2c30;border-color:#44444a}
+[data-theme="dark"] .workspace-resizer span{background:#929299}
+[data-theme="dark"] .workspace-resizer:hover,[data-theme="dark"] .workspace-resizer:focus-visible{background:#3d3d43}
+[data-theme="dark"] .translation{border-color:#505057}
+[data-theme="dark"] .description::placeholder,[data-theme="dark"] .source textarea::placeholder{color:#b8b8c0}
+[data-theme="dark"] .hero p,[data-theme="dark"] .section-label,[data-theme="dark"] .engine-bar,[data-theme="dark"] .source-heading,[data-theme="dark"] .modal>p,[data-theme="dark"] .modal small,[data-theme="dark"] .model-badge,[data-theme="dark"] .input-meta,[data-theme="dark"] .output-actions,[data-theme="dark"] footer,[data-theme="dark"] .muted,[data-theme="dark"] .convert-bar>span,[data-theme="dark"] .preview p{color:#c6c6cd}
