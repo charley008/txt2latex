@@ -36,6 +36,26 @@ location / {
 
 若 Nginx 也在容器中运行，请使用它能访问的宿主机地址或共享 Docker 网络中的服务名，不能使用该容器自身的 `127.0.0.1`。域名与 HTTPS 在你现有的 Nginx 中自行配置。
 
+### 使用现有域名的子路径
+
+支持 `https://你的域名/txt2latex/`，无需新增子域名。在现有 HTTPS 站点的 server 中加入：
+
+```nginx
+location = /txt2latex {
+    return 301 /txt2latex/;
+}
+
+location /txt2latex/ {
+    proxy_pass http://127.0.0.1:8080/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+`proxy_pass` 末尾的 `/` 必须保留，用于去掉上游请求中的 `/txt2latex/` 前缀；入口也需以 `/` 结尾。静态资源使用相对路径，同一镜像兼容根路径和子路径。Chrome 本地 AI 需要 HTTPS（localhost 除外）。Nginx 在容器内运行时，将上游地址替换为它能访问的宿主机地址。
+
 ## 功能介绍
 
 - 输入自然语言，生成 LaTeX 数学公式，支持实时预览和源码编辑。
