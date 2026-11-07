@@ -1,59 +1,81 @@
-name: Build and publish Docker image
+name: Build and publish Docker image
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies and test
+        run: |
+          npm ci
+          npm test
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Image tags
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/txt2latex
+          tags: |
+            type=raw,value=latest
+            type=ref,event=tag
+            type=sha
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Sync Docker Hub README
+        uses: peter-evans/dockerhub-description@e98e4d1628a5f3be2be7c231e50981aee98723ae
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/txt2latex
+          readme-filepath: ./README.md
+          short-description: Ëá™ÁÑ∂ËØ≠Ë®ÄËΩ¨ LaTeXÔºåÊîØÊåÅ Chrome Êú¨Âú∞ AI Âíå‰∏™‰∫∫‰∫ëÁ´Ø API
 
-on:
-  push:
-    tags: ['v*']
-
-permissions:
-  contents: read
-
-jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - name: Install dependencies and test
+      - name: Remove superseded initial image tag
+        if: github.ref == 'refs/tags/v1.0.0'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        shell: python
         run: |
-          npm ci
-          npm test
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-      - name: Set up Buildx
-        uses: docker/setup-buildx-action@v4
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Image tags
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: ${{ secrets.DOCKER_USERNAME }}/txt2latex
-          tags: |
-            type=raw,value=latest
-            type=ref,event=tag
-            type=sha
-      - name: Build and push
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Sync Docker Hub README
-        uses: peter-evans/dockerhub-description@e98e4d1628a5f3be2be7c231e50981aee98723ae
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_USERNAME }}/txt2latex
-          readme-filepath: ./README.md
-          short-description: ◊‘»ª”Ô—‘◊™ LaTeX£¨÷ß≥÷ Chrome ±æµÿ AI ∫Õ∏ˆ»À‘∆∂À API
+          import json, os, urllib.request, urllib.error
+          payload = json.dumps({"username": os.environ["DOCKER_USERNAME"], "password": os.environ["DOCKER_PASSWORD"]}).encode()
+          login = urllib.request.Request("https://hub.docker.com/v2/users/login/", data=payload, headers={"Content-Type": "application/json"})
+          with urllib.request.urlopen(login) as response:
+              token = json.load(response)["token"]
+          url = "https://hub.docker.com/v2/repositories/" + os.environ["DOCKER_USERNAME"] + "/txt2latex/tags/sha-f27f9f5/"
+          request = urllib.request.Request(url, method="DELETE", headers={"Authorization": "JWT " + token})
+          try:
+              with urllib.request.urlopen(request) as response:
+                  print("Removed superseded initial image tag")
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise RuntimeError("Old tag cleanup failed: HTTP " + str(error.code)) from None
+              print("Superseded tag already absent")
