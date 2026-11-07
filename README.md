@@ -1,6 +1,6 @@
 # 言式 · Text to LaTeX
 
-将中文、英文自然语言转为 LaTeX 的独立网站。React + KaTeX 前端，Node.js 同时提供静态网页和 API，单个 Docker 容器部署。默认使用 DeepSeek `deepseek-v4-flash`，支持 OpenAI 兼容 Chat Completions 接口。
+将中文、英文自然语言转为 LaTeX 的独立网站。React + KaTeX 前端，Node.js 提供静态网页和健康检查，单个 Docker 容器部署。默认使用 Chrome 内置 Gemini Nano 在本机转换；也可自行配置 DeepSeek 等支持 OpenAI 兼容 Chat Completions 接口的服务，使用各自的 API Key。
 
 ## Docker 部署
 
@@ -17,7 +17,7 @@ docker compose logs -f
 docker compose down
 ```
 
-容器内部监听 3000，默认映射到宿主机 8080。网页与 `/api/` 由同一个 Node.js 服务提供，无需额外的 Nginx 容器。公式渲染资源随镜像构建；Google 字体不可用时自动使用系统字体。
+容器内部监听 3000，默认映射到宿主机 8080。网页与 `/api/health` 健康检查由同一个 Node.js 服务提供，无需额外的 Nginx 容器。公式渲染资源随镜像构建，界面使用系统字体。
 
 ### 接入你现有的 Nginx
 
