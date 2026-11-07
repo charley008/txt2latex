@@ -60,3 +60,6 @@
 .source-pane .source textarea{height:150px;min-height:120px;resize:vertical}
 [data-theme="dark"] .source-pane{border-color:#344237}
 @media(max-width:620px){.workspace{grid-template-columns:minmax(0,1fr)}.description{flex:none;height:120px}.output-pane .preview{min-height:190px}.source-pane .source textarea{height:140px}.convert-bar{flex-wrap:nowrap}}
+
+.engine-bar label{flex-shrink:0}.engine-bar select{max-width:none;min-width:230px;padding-right:28px}
+@media(max-width:380px){.engine-bar label{width:100%;flex-wrap:wrap}.engine-bar select{min-width:0;max-width:100%;flex:1}}
