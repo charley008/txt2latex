@@ -37,3 +37,5 @@
 @media(max-width:620px){.header-right{gap:8px}}
 
 .brand-logo{display:block;flex-shrink:0;width:44px;height:44px}
+
+.github-link{text-decoration:none;padding:9px;justify-content:center;flex-shrink:0}
