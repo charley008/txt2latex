@@ -125,3 +125,5 @@
 .convert-bar .primary,[data-theme="dark"] .convert-bar .primary{background:#16803c;color:#fff}.convert-bar .primary:hover,[data-theme="dark"] .convert-bar .primary:hover{background:#126b32}.convert-bar .primary:disabled,[data-theme="dark"] .convert-bar .primary:disabled{background:#16803c;color:#fff;opacity:.6}
 
 .sample-math{font-style:normal}
+
+.connection-test{display:flex;align-items:center;gap:12px;margin-top:14px}.connection-test button{flex-shrink:0}.settings-feedback{font-size:11px;line-height:1.7;margin-top:8px;overflow-wrap:anywhere}.settings-feedback.success{color:#16803c}.settings-feedback.failure{color:#b55a37}[data-theme="dark"] .settings-feedback.success{color:#96dca8}[data-theme="dark"] .settings-feedback.failure{color:#ffb59b}

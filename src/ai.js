@@ -3,7 +3,7 @@ import {cleanLatex,systemPrompt} from '../server/latex.js';
 import {localSystemPrompt,localRequest} from './local-prompt.js';
 import {translateForLocal} from './translate.js';
 const defaults={baseUrl:'https://api.deepseek.com',model:'deepseek-v4-flash',apiKey:'',remember:false};
-export function readSettings(){try{const d=JSON.parse(localStorage.getItem('formula-ai-settings')||'{}');return {...defaults,baseUrl:typeof d.baseUrl==='string'?d.baseUrl:defaults.baseUrl,model:typeof d.model==='string'?d.model:defaults.model,apiKey:d.remember===true&&typeof d.apiKey==='string'?d.apiKey:'',remember:d.remember===true}}catch{return {...defaults}}}
+export function readSettings(){try{const d=JSON.parse(localStorage.getItem('formula-ai-settings')||'{}');return {...defaults,baseUrl:typeof d.baseUrl==='string'&&d.baseUrl.trim()?d.baseUrl:defaults.baseUrl,model:typeof d.model==='string'?d.model:defaults.model,apiKey:d.remember===true&&typeof d.apiKey==='string'?d.apiKey:'',remember:d.remember===true}}catch{return {...defaults}}}
 export function saveSettings(settings){localStorage.setItem('formula-ai-settings',JSON.stringify({...settings,apiKey:settings.remember?settings.apiKey:''}));}
 export async function getLocalStatus(){
  if(!globalThis.isSecureContext)return '本地 AI 需要 HTTPS 或 localhost';
@@ -30,15 +30,23 @@ export async function convertLocal(text,preferences,onProgress=()=>{},onTranslat
   return result;
  }catch(e){throw Error(`本地 AI 转换失败：${e.message}。可手动选择云端 API；未自动上传输入。`)}finally{session?.destroy()}
 }
-export async function convertCloud({text,preferences='',baseUrl,model,apiKey}){
+export async function convertCloud({text,preferences='',baseUrl,model,apiKey,maxTokens=4096}){
  if(!apiKey.trim())throw Error('请在接口设置中填写你自己的 API Key。');
  if(!model.trim())throw Error('请填写模型名称。');
- let url;try{url=new URL(baseUrl)}catch{throw Error('API 地址无效。')}
+ let url;try{url=new URL(baseUrl.trim())}catch{throw Error('API 地址无效。')}
  if(url.username||url.password||url.search||url.hash)throw Error('API 地址不能包含用户名、密码、查询参数或片段。');
  if(url.protocol!=='https:' && !(url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname)))throw Error('云端接口必须使用 HTTPS，本机接口可使用 HTTP。');
+ const base=url.href.replace(/\/+$/,'');
+ const endpoint=base.endsWith('/chat/completions')?base:`${base}/chat/completions`;
  try{
-  const r=await fetch(`${url.href.replace(/\/+$/,'')}/chat/completions`,{method:'POST',credentials:'omit',referrerPolicy:'no-referrer',headers:{'Content-Type':'application/json',Authorization:`Bearer ${apiKey.trim()}`},body:JSON.stringify({model:model.trim(),messages:[{role:'system',content:systemPrompt},{role:'user',content:JSON.stringify({description:text,formattingPreferences:preferences})}],stream:false,max_tokens:4096}),signal:AbortSignal.timeout(60000)});
+  const r=await fetch(endpoint,{method:'POST',credentials:'omit',referrerPolicy:'no-referrer',headers:{'Content-Type':'application/json',Authorization:`Bearer ${apiKey.trim()}`},body:JSON.stringify({model:model.trim(),messages:[{role:'system',content:systemPrompt},{role:'user',content:JSON.stringify({description:text,formattingPreferences:preferences})}],stream:false,max_tokens:maxTokens}),signal:AbortSignal.timeout(60000)});
   if(!r.ok)throw Error(r.status===401||r.status===403?'认证失败，请检查自己的 API Key。':r.status===429?'接口限流或余额不足。':`AI 接口返回 HTTP ${r.status}，请检查模型和接口地址。`);
   const d=await r.json();if(typeof d.choices?.[0]?.message?.content!=='string')throw Error('接口响应缺少公式内容。');return cleanLatex(d.choices[0].message.content);
  }catch(e){if(e.name==='TimeoutError')throw Error('AI 请求超时，请重试。');if(e instanceof TypeError)throw Error('无法直接连接 AI 接口：请检查网络、地址及提供商是否允许浏览器跨域（CORS）。本站不会中转密钥。');throw e}
+}
+
+export async function testCloudConnection(settings){
+ const started=performance.now();
+ await convertCloud({...settings,text:'x equals 1',preferences:'',maxTokens:32});
+ return `连接成功：地址、Key 和模型已通过实际请求验证（${((performance.now()-started)/1000).toFixed(1)} 秒）。`;
 }

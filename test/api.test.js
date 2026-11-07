@@ -57,3 +57,12 @@ test('invalid local LaTeX receives one syntax repair attempt',async()=>{
  globalThis.LanguageModel={availability:async()=> 'available',create:async()=>({prompt:async()=>++prompts===1?String.raw`\frac{x}{`:String.raw`\frac{x}{2}`,destroy(){destroyed=true}})};
  try{assert.equal(await convertLocal('x divided by 2',''),String.raw`\frac{x}{2}`);assert.equal(prompts,2);assert.equal(destroyed,true)}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
 });
+
+test('connection test supports full endpoints and reports authentication failure',async()=>{
+ const {testCloudConnection}=await import('../src/ai.js');const original=globalThis.fetch;
+ try{
+  globalThis.fetch=async(url,opts)=>{assert.equal(url,'https://api.deepseek.com/v1/chat/completions');assert.equal(JSON.parse(opts.body).max_tokens,32);return Response.json({choices:[{message:{content:'x=1'}}]})};
+  assert.match(await testCloudConnection({baseUrl:' https://api.deepseek.com/v1/chat/completions/ ',model:'test',apiKey:'own-key'}),/连接成功/);
+  globalThis.fetch=async()=>new Response('',{status:401});await assert.rejects(()=>testCloudConnection({baseUrl:'https://api.deepseek.com',model:'test',apiKey:'bad'}),/认证失败/);
+ }finally{globalThis.fetch=original}
+});
