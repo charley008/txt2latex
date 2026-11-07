@@ -42,3 +42,18 @@ test('protects mathematical case, coefficients, exponential bases and integral t
  assert.ok(restored.includes(' Q '));assert.ok(restored.includes(' F(x) '));assert.ok(restored.includes('definite integral'));assert.ok(restored.includes('t^{2}'));assert.ok(restored.includes('e^{-t}'));
  const q=protectMath('Q与a下标ij');assert.ok(q.restore(q.text).includes('a_{ij}'));assert.throws(()=>q.restore('lost symbols'),/遗漏/);
 });
+
+test('normalizes separate Markdown formulas and unwrapped aligned rows',async()=>{
+ const {default:katex}=await import('katex');
+ const inputs=[String.raw`$F(x) = \int_0^x t^2 e^{-t} dt$
+$F'(x) = x^2 e^{-x}$`,String.raw`F(x)&=x^2\\F'(x)&=2x`];
+ for(const input of inputs){const result=cleanLatex(input);assert.ok(result.includes('\\begin{aligned}'));assert.ok(!result.includes('$'));assert.doesNotThrow(()=>katex.renderToString(result,{throwOnError:true}))}
+ const literal=String.raw`\text{cost: \$5}`;assert.equal(cleanLatex(literal),literal);
+ const matrix=String.raw`\begin{bmatrix}1&2\\3&4\end{bmatrix}`;assert.equal(cleanLatex(matrix),matrix);
+});
+
+test('invalid local LaTeX receives one syntax repair attempt',async()=>{
+ let prompts=0,destroyed=false;globalThis.isSecureContext=true;
+ globalThis.LanguageModel={availability:async()=> 'available',create:async()=>({prompt:async()=>++prompts===1?String.raw`\frac{x}{`:String.raw`\frac{x}{2}`,destroy(){destroyed=true}})};
+ try{assert.equal(await convertLocal('x divided by 2',''),String.raw`\frac{x}{2}`);assert.equal(prompts,2);assert.equal(destroyed,true)}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
+});

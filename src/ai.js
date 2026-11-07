@@ -1,3 +1,4 @@
+import katex from 'katex';
 import {cleanLatex,systemPrompt} from '../server/latex.js';
 import {localSystemPrompt,localRequest} from './local-prompt.js';
 import {translateForLocal} from './translate.js';
@@ -20,7 +21,13 @@ export async function convertLocal(text,preferences,onProgress=()=>{},onTranslat
   onProgress(state==='available'?'正在加载已下载的本地模型…':'正在准备本地模型资源…');
   session=await LanguageModel.create({initialPrompts:[{role:'system',content:localSystemPrompt}],monitor(m){m.addEventListener('downloadprogress',e=>{if(state!=='available' && e.loaded<1)onProgress(`正在下载本地模型资源 ${Math.round(e.loaded*100)}%`);else onProgress('正在加载本地模型…')})}});
   onProgress('正在使用本地模型转换…');
-  return cleanLatex(await session.prompt(localRequest(translated.text,translated.preferences)));
+  let result=cleanLatex(await session.prompt(localRequest(translated.text,translated.preferences)));
+  const valid=value=>{try{katex.renderToString(value,{throwOnError:true,trust:false,strict:'ignore',maxExpand:1000});return true}catch{return false}};
+  if(!valid(result)){
+   onProgress('正在修复公式格式…');
+   try{const repaired=cleanLatex(await session.prompt(`Repair ONLY the LaTeX syntax of the following formula. Preserve its mathematical meaning, every variable, operator and equality. Return one valid LaTeX expression without dollar signs or Markdown. For multiple rows use a complete aligned environment.\n${result}`));if(valid(repaired))result=repaired}catch{/* Keep original source available for manual editing. */}
+  }
+  return result;
  }catch(e){throw Error(`本地 AI 转换失败：${e.message}。可手动选择云端 API；未自动上传输入。`)}finally{session?.destroy()}
 }
 export async function convertCloud({text,preferences='',baseUrl,model,apiKey}){

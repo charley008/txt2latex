@@ -6,6 +6,15 @@ export function cleanLatex(value) {
   }
   // Models often wrap a single expression in equation, which adds unwanted numbering.
   text=text.replace(/^\\begin\{equation\*?\}\s*([\s\S]*?)\s*\\end\{equation\*?\}$/, '$1').trim();
+  // Models sometimes emit separate Markdown math spans rather than one expression.
+  // Strip math delimiters only, preserving escaped literal dollars.
+  text=text.replace(/(?<!\\)\$+\s*\n\s*(?<!\\)\$+/g,'\n')
+    .replace(/(?<!\\)\$+/g,'').trim();
+  // Unwrapped lines/row separators need a math environment. Never split environments.
+  if(!/\\(?:begin|end)\{/.test(text)){
+    const rows=text.split(/\\\\\s*|\r?\n/).map(row=>row.trim()).filter(Boolean);
+    if(rows.length>1 || /(?<!\\)&/.test(text)) text=`\\begin{aligned}\n${rows.join(' \\\\\n')}\n\\end{aligned}`;
+  }
   if(!text || text.length>24000) throw new Error('模型未返回有效公式，请重试。');
   return text;
 }
