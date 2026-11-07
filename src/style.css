@@ -69,3 +69,6 @@
 
 .input-pane .description{flex:none;height:240px;min-height:120px;resize:vertical;overflow:auto}.input-pane .input-meta{margin-top:0}.output-pane .preview{min-height:260px}.source-pane .source textarea{resize:vertical;overflow:auto}
 @media(max-width:620px){.input-pane .description{height:210px;min-height:120px}.output-pane .preview{min-height:190px}}
+
+.workspace{grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr)}.input-pane .description{height:180px}
+@media(max-width:620px){.workspace{grid-template-columns:minmax(0,1fr)}.input-pane .description{height:160px}}
