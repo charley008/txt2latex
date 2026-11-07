@@ -66,3 +66,6 @@
 
 .input-pane .description{height:180px;min-height:180px}.source-pane .source textarea{height:95px;min-height:80px}
 @media(max-width:620px){.input-pane .description{height:160px;min-height:160px}.source-pane .source textarea{height:95px;min-height:80px}}
+
+.input-pane .description{flex:none;height:240px;min-height:120px;resize:vertical;overflow:auto}.input-pane .input-meta{margin-top:0}.output-pane .preview{min-height:260px}.source-pane .source textarea{resize:vertical;overflow:auto}
+@media(max-width:620px){.input-pane .description{height:210px;min-height:120px}.output-pane .preview{min-height:190px}}
