@@ -36,27 +36,6 @@ location / {
 
 若 Nginx 也在容器中运行，请使用它能访问的宿主机地址或共享 Docker 网络中的服务名，不能使用该容器自身的 `127.0.0.1`。域名与 HTTPS 在你现有的 Nginx 中自行配置。
 
-## GitHub 自动构建并发布 Docker Hub
-
-已提供 `.github/workflows/docker-publish.yml`。推送到 `main` 会发布 `你的DockerHub用户名/txt2latex:latest`；推送 `v` 开头的标签会发布对应标签（如 `v1.0.0`），还会生成提交 SHA 标签。支持 Linux amd64 和 arm64，也可在 GitHub Actions 中手动运行。版本标签不会覆盖 latest。
-
-1. 将本项目上传至自己的 GitHub 仓库（包括 `package-lock.json` 和 `.github`，不要上传 `.env`、`node_modules`、`dist`）。默认分支若不是 `main`，修改工作流中的分支名与 latest 条件。
-2. 在 Docker Hub 创建名为 `txt2latex` 的仓库。
-3. 在 Docker 账户设置中创建具有 Read & Write 权限的 Personal Access Token。
-4. GitHub 仓库 → Settings → Secrets and variables → Actions：在 Variables 中添加 `DOCKERHUB_USERNAME`（Docker Hub 用户名，不是邮箱）；在 Secrets 中添加 `DOCKERHUB_TOKEN`（刚创建的 Token）。
-5. 推送代码到 main，然后在 Actions 中查看 Build and publish Docker image 的构建结果。
-
-服务器不配置任何 AI 密钥。每个访客独立使用 Chrome 本地模型或填写自己的 API Key。
-
-服务器使用已发布镜像时，只需下载 `compose.hub.yaml` 与 `.env.example`，将后者复制为 `.env`，再追加 `DOCKERHUB_USERNAME=你的DockerHub用户名`。执行：
-
-```powershell
-docker compose -f compose.hub.yaml pull
-docker compose -f compose.hub.yaml up -d
-```
-
-默认访问 8080 端口。后续更新重复以上两条命令即可；固定版本可在 `.env` 中增加 `IMAGE_TAG=v1.0.0`。
-
 ## 使用方法与隐私
 
 - 默认使用 Chrome 内置 Gemini Nano，通过 Prompt API 在浏览器本机推理。点击生成后才可能触发首次模型下载，界面显示进度。不支持时会提示，不会自动切换云端。
