@@ -28,3 +28,9 @@ test('ready model initialization is not labeled as downloading',async()=>{
  globalThis.isSecureContext=true;globalThis.LanguageModel={availability:async()=> 'available',create:async(opts)=>{opts.monitor({addEventListener:(name,cb)=>cb({loaded:1})});return {prompt:async()=> 'x',destroy(){}}}};
  try{const progress=[];await convertLocal('x','',p=>progress.push(p));assert.ok(progress.length>0);assert.ok(progress.every(p=>!p.includes('正在下载')))}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
 });
+
+test('Chinese is translated locally before generation; English bypasses translation',async()=>{
+ const {translateForLocal}=await import('../src/translate.js');let destroyed=false;const calls=[];
+ globalThis.Translator={availability:async(o)=>{assert.equal(o.sourceLanguage,'zh');return 'available'},create:async()=>({translate:async(t)=>{calls.push(t);return 'English: '+t},destroy(){destroyed=true}})};
+ try{assert.deepEqual(await translateForLocal('中文','要求'),{text:'English: 中文',preferences:'English: 要求'});assert.deepEqual(calls,['中文','要求']);assert.equal(destroyed,true);calls.length=0;assert.deepEqual(await translateForLocal('x equals 1',''),{text:'x equals 1',preferences:''});assert.equal(calls.length,0);delete globalThis.Translator;await assert.rejects(()=>translateForLocal('中文',''),/内置翻译/)}finally{delete globalThis.Translator}
+});
