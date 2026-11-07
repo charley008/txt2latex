@@ -42,3 +42,21 @@
 
 .output-pane,.input-pane{min-width:0}.preview>div{width:100%;text-align:center}.preview .katex-display{margin:0;min-width:max-content;padding:12px 24px}.preview .katex-display>.katex{display:block;text-align:center}.preview .katex-display>.katex>.katex-html{display:block;position:relative}.preview .katex-display>.katex>.katex-html>.katex-tag{right:0}.source textarea{font-size:13px;line-height:1.8}.description{flex:0 1 auto}.input-meta{margin-top:auto}
 @media(max-width:620px){.workspace{grid-template-columns:minmax(0,1fr)}.source textarea{min-height:130px}.input-meta{margin-top:0}}
+
+/* The description and visual result share the top row; source spans the full width. */
+.workspace{grid-template-columns:minmax(260px,.55fr) minmax(0,1.45fr)}
+.source-pane{grid-column:1 / -1;min-width:0;border-top:1px solid #e4e7df}
+.source-pane .source-heading{border-top:0;padding-top:18px}
+.description{height:140px;min-height:110px;flex:1}
+.input-pane .panel-heading{padding:18px 20px}
+.input-pane .muted{display:none}
+.input-pane .description{padding:8px 20px;font-size:15px}
+.input-meta{padding:10px 20px}
+.convert-bar{padding:14px 18px;gap:8px;flex-wrap:wrap}
+.convert-bar .primary{padding:10px 14px}
+.output-pane{display:flex;flex-direction:column}
+.output-pane .preview{height:auto;min-height:220px;flex:1}
+.source-pane .source{padding:8px 24px}
+.source-pane .source textarea{height:150px;min-height:120px;resize:vertical}
+[data-theme="dark"] .source-pane{border-color:#344237}
+@media(max-width:620px){.workspace{grid-template-columns:minmax(0,1fr)}.description{flex:none;height:120px}.output-pane .preview{min-height:190px}.source-pane .source textarea{height:140px}.convert-bar{flex-wrap:nowrap}}
