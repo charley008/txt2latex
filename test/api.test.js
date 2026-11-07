@@ -66,3 +66,13 @@ test('connection test supports full endpoints and reports authentication failure
   globalThis.fetch=async()=>new Response('',{status:401});await assert.rejects(()=>testCloudConnection({baseUrl:'https://api.deepseek.com',model:'test',apiKey:'bad'}),/认证失败/);
  }finally{globalThis.fetch=original}
 });
+
+test('simple geometry is deterministic without model or translation',async()=>{
+ const {simpleFormula}=await import('../src/simple-formula.js');
+ assert.equal(await convertLocal('三角形ABC',''),String.raw`\triangle ABC`);
+ assert.equal(simpleFormula('三角形 a b c。'),String.raw`\triangle abc`);
+ assert.equal(simpleFormula('角ABC等于45度'),String.raw`\angle ABC = 45^\circ`);
+ assert.equal(simpleFormula('角A'),String.raw`\angle A`);
+ assert.equal(simpleFormula('三角形ABC，AB等于3'),null);
+ assert.equal(simpleFormula('三角形ABC','使用其他符号'),null);
+});
