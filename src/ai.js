@@ -8,7 +8,7 @@ export function saveSettings(settings){localStorage.setItem('formula-ai-settings
 export async function getLocalStatus(){
  if(!globalThis.isSecureContext)return '本地 AI 需要 HTTPS 或 localhost';
  if(!globalThis.LanguageModel)return '当前浏览器不支持，请使用支持 Prompt API 的桌面 Chrome 或选择云端 API';
- try{const a=await LanguageModel.availability();return {available:'本地模型已就绪 · 中文效果需核对',downloadable:'Chrome 报告需下载模型资源 · 点击生成开始',downloading:'本地模型正在下载',unavailable:'Chrome 报告模型暂不可用（unavailable），请检查浏览器版本、模型状态与运行条件'}[a]||'本地 AI 状态未知'}catch{return '无法检测本地模型，可选择云端 API'}
+ try{const a=await LanguageModel.availability();return {available:'本地模型已就绪 · 适合简单公式；复杂公式可能有误差，建议使用云端大模型并核对结果',downloadable:'Chrome 报告需下载模型资源 · 点击生成开始',downloading:'本地模型正在下载',unavailable:'Chrome 报告模型暂不可用（unavailable），请检查浏览器版本、模型状态与运行条件'}[a]||'本地 AI 状态未知'}catch{return '无法检测本地模型，可选择云端 API'}
 }
 export async function convertLocal(text,preferences,onProgress=()=>{},onTranslation=()=>{}){
  if(!globalThis.isSecureContext||!globalThis.LanguageModel)throw Error('本地 AI 不可用：请使用 HTTPS/localhost 和支持 Prompt API 的桌面 Chrome，或手动选择「我的云端 API」。');
