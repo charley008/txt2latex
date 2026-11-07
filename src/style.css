@@ -95,3 +95,7 @@
 [data-theme="dark"] .outline,[data-theme="dark"] select,[data-theme="dark"] .example-grid button,[data-theme="dark"] .history-items button{color:#e9eee5}
 [data-theme="dark"] .example-grid small,[data-theme="dark"] .example-grid button>svg,[data-theme="dark"] .section-label>button,[data-theme="dark"] .footer-logo,[data-theme="dark"] .brand b>span,[data-theme="dark"] .line-no,[data-theme="dark"] .icon-button{color:#bcc9b5}
 [data-theme="dark"] .live,[data-theme="dark"] .eyebrow,[data-theme="dark"] .step{color:#bbd39f}
+
+.hero{padding:18px 0 18px}.hero h1{font-size:30px;line-height:1.35;letter-spacing:-.8px;margin:7px 0 7px}.hero .eyebrow{font-size:8px;letter-spacing:1.5px}.hero p{font-size:12px;line-height:1.6}
+@media(min-width:1500px){.hero{padding-top:20px}}
+@media(max-width:620px){.hero{padding:16px 0}.hero h1{font-size:25px}.hero p{font-size:11px}}
