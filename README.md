@@ -1,6 +1,6 @@
 # 言式 · Text to LaTeX
 
-本程序由 CODEX + gpt-6.1SOL 开发。
+本程序由 CODEX + GPT-6.1SOL 开发。
 
 将中文、英文自然语言转为 LaTeX 的独立网站。React + KaTeX 前端，Node.js 提供静态网页和健康检查，单个 Docker 容器部署。默认使用 Chrome 内置 Gemini Nano 在本机转换；也可自行配置 DeepSeek 等支持 OpenAI 兼容 Chat Completions 接口的服务，使用各自的 API Key。
 
