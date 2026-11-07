@@ -19,3 +19,7 @@ test('local model lifecycle and unsupported device',async()=>{
  globalThis.isSecureContext=true;let destroyed=false;globalThis.LanguageModel={availability:async()=> 'available',create:async()=>({prompt:async()=> '$x$',destroy:()=>{destroyed=true}})};
  try{assert.equal(await convertLocal('x',''),'x');assert.equal(destroyed,true);LanguageModel.availability=async()=> 'unavailable';await assert.rejects(()=>convertLocal('x',''),/unavailable/)}finally{delete globalThis.LanguageModel;delete globalThis.isSecureContext}
 });
+
+test('removes unsolicited numbered equation wrapper',()=>{assert.equal(cleanLatex(String.raw`\begin{equation}
+x^2+y^2=1
+\end{equation}`),'x^2+y^2=1')});
