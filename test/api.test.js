@@ -34,3 +34,11 @@ test('Chinese is translated locally before generation; English bypasses translat
  globalThis.Translator={availability:async(o)=>{assert.equal(o.sourceLanguage,'zh');return 'available'},create:async()=>({translate:async(t)=>{calls.push(t);return 'English: '+t},destroy(){destroyed=true}})};
  try{assert.deepEqual(await translateForLocal('中文','要求'),{text:'English: 中文',preferences:'English: 要求'});assert.deepEqual(calls,['中文','要求']);assert.equal(destroyed,true);calls.length=0;assert.deepEqual(await translateForLocal('x equals 1',''),{text:'x equals 1',preferences:''});assert.equal(calls.length,0);delete globalThis.Translator;await assert.rejects(()=>translateForLocal('中文',''),/内置翻译/)}finally{delete globalThis.Translator}
 });
+
+test('protects mathematical case, coefficients, exponential bases and integral terminology',async()=>{
+ const {protectMath}=await import('../src/math-translation.js');
+ const p=protectMath('定义 Q，每项 a 下标 i j，F(x) 等于定积分，t 的平方乘以 e 的负 t 次方');
+ const restored=p.restore(p.text.toLowerCase());
+ assert.ok(restored.includes(' Q '));assert.ok(restored.includes(' F(x) '));assert.ok(restored.includes('definite integral'));assert.ok(restored.includes('t^{2}'));assert.ok(restored.includes('e^{-t}'));
+ const q=protectMath('Q与a下标ij');assert.ok(q.restore(q.text).includes('a_{ij}'));assert.throws(()=>q.restore('lost symbols'),/遗漏/);
+});
