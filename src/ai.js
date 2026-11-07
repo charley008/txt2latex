@@ -1,4 +1,5 @@
 import {cleanLatex,systemPrompt} from '../server/latex.js';
+import {localSystemPrompt,localExamples,localRequest} from './local-prompt.js';
 const defaults={baseUrl:'https://api.deepseek.com',model:'deepseek-v4-flash',apiKey:'',remember:false};
 export function readSettings(){try{const d=JSON.parse(localStorage.getItem('formula-ai-settings')||'{}');return {...defaults,baseUrl:typeof d.baseUrl==='string'?d.baseUrl:defaults.baseUrl,model:typeof d.model==='string'?d.model:defaults.model,apiKey:d.remember===true&&typeof d.apiKey==='string'?d.apiKey:'',remember:d.remember===true}}catch{return {...defaults}}}
 export function saveSettings(settings){localStorage.setItem('formula-ai-settings',JSON.stringify({...settings,apiKey:settings.remember?settings.apiKey:''}));}
@@ -14,9 +15,9 @@ export async function convertLocal(text,preferences,onProgress=()=>{}){
  let session;
  try{
   onProgress(state==='available'?'正在加载已下载的本地模型…':'正在准备本地模型资源…');
-  session=await LanguageModel.create({initialPrompts:[{role:'system',content:systemPrompt}],monitor(m){m.addEventListener('downloadprogress',e=>{if(state!=='available' && e.loaded<1)onProgress(`正在下载本地模型资源 ${Math.round(e.loaded*100)}%`);else onProgress('正在加载本地模型…')})}});
+  session=await LanguageModel.create({initialPrompts:[{role:'system',content:localSystemPrompt},...localExamples],monitor(m){m.addEventListener('downloadprogress',e=>{if(state!=='available' && e.loaded<1)onProgress(`正在下载本地模型资源 ${Math.round(e.loaded*100)}%`);else onProgress('正在加载本地模型…')})}});
   onProgress('正在使用本地模型转换…');
-  return cleanLatex(await session.prompt(JSON.stringify({description:text,formattingPreferences:preferences})));
+  return cleanLatex(await session.prompt(localRequest(text,preferences)));
  }catch(e){throw Error(`本地 AI 转换失败：${e.message}。可手动选择云端 API；未自动上传输入。`)}finally{session?.destroy()}
 }
 export async function convertCloud({text,preferences='',baseUrl,model,apiKey}){
