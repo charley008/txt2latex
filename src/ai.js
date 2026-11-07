@@ -2,7 +2,6 @@ import katex from 'katex';
 import {cleanLatex,systemPrompt} from '../server/latex.js';
 import {localSystemPrompt,localRequest} from './local-prompt.js';
 import {translateForLocal} from './translate.js';
-import {simpleFormula} from './simple-formula.js';
 const defaults={baseUrl:'https://api.deepseek.com',model:'deepseek-v4-flash',apiKey:'',remember:false};
 export function readSettings(){try{const d=JSON.parse(localStorage.getItem('formula-ai-settings')||'{}');return {...defaults,baseUrl:typeof d.baseUrl==='string'&&d.baseUrl.trim()?d.baseUrl:defaults.baseUrl,model:typeof d.model==='string'?d.model:defaults.model,apiKey:d.remember===true&&typeof d.apiKey==='string'?d.apiKey:'',remember:d.remember===true}}catch{return {...defaults}}}
 export function saveSettings(settings){localStorage.setItem('formula-ai-settings',JSON.stringify({...settings,apiKey:settings.remember?settings.apiKey:''}));}
@@ -12,8 +11,6 @@ export async function getLocalStatus(){
  try{const a=await LanguageModel.availability();return {available:'本地模型已就绪 · 适合简单公式；复杂公式可能有误差，建议使用云端大模型并核对结果',downloadable:'Chrome 报告需下载模型资源 · 点击生成开始',downloading:'本地模型正在下载',unavailable:'Chrome 报告模型暂不可用（unavailable），请检查浏览器版本、模型状态与运行条件'}[a]||'本地 AI 状态未知'}catch{return '无法检测本地模型，可选择云端 API'}
 }
 export async function convertLocal(text,preferences,onProgress=()=>{},onTranslation=()=>{}){
- const simple=simpleFormula(text,preferences);
- if(simple!==null){onTranslation(null);onProgress('正在使用本地规则转换…');return simple;}
  if(!globalThis.isSecureContext||!globalThis.LanguageModel)throw Error('本地 AI 不可用：请使用 HTTPS/localhost 和支持 Prompt API 的桌面 Chrome，或手动选择「我的云端 API」。');
  const state=await LanguageModel.availability();
  if(state==='unavailable')throw Error('Chrome 返回 unavailable，暂时不能创建本地模型会话。这不一定是硬件不足：请在桌面 Chrome 打开 chrome://on-device-internals 查看模型状态，并确认浏览器版本及磁盘空间。也可手动选择「我的云端 API」。');

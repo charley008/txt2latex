@@ -1,5 +1,6 @@
 // No few-shot conversations: avoid the small model copying unrelated formulas.
 export const localSystemPrompt = String.raw`Transcribe the complete mathematical description into LaTeX. Output only LaTeX, without Markdown, dollar delimiters, explanation, or numbering. Do not solve or simplify.
+Convert mathematical words to actual LaTeX notation, not English words used as letters. Geometry names such as triangle, angle, line segment, vector, parallel and perpendicular describe mathematical objects or relations. Represent them using the appropriate mathematical command. For example, triangle ABC is \triangle ABC, not Triangle ABC; angle A is \angle A, not Angle A. Apply this principle to other mathematical terminology, not only these examples.
 Preserve every variable EXACTLY, including case, subscripts, and existing math fragments. A letter such as a is a variable, not an English article. Never omit a coefficient or factor.
 Preserve grouping: square of a difference means (u-v)^2, not u-v^2. The denominator of a nested fraction is the entire stated group. Keep the base and exponent of exponentials unchanged.
 A definite integral requires an integral symbol, both limits, integrand and differential. Do not substitute a piecewise function for an integral.
