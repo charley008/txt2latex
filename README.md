@@ -57,6 +57,6 @@ npm.cmd run dev
 
 访问 http://localhost:5173 。不需要 API 后端。生产构建 `npm.cmd run build`，随后 `npm.cmd start` 在 3000 提供静态网页。测试 `npm.cmd test` 覆盖本地模型生命周期、个人密钥保存规则、云端直连协议及共享 API 移除；真实模型质量与云端 CORS 仍需在目标浏览器验证。
 
-## 原理与参考
+## 特别鸣谢
 
-参考 [ArronHC/Text2Math](https://github.com/ArronHC/Text2Math) 的自然语言 → 提示词约束 → OpenAI 兼容接口 → LaTeX 清洗 → 渲染预览流程；本项目独立实现 Web UI 和服务端，不依赖 Obsidian。DeepSeek 的模型名称可在界面手动修改，以适配兼容服务的命名。
+[ArronHC/Text2Math](https://github.com/ArronHC/Text2Math)
