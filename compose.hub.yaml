@@ -1,10 +1,8 @@
-# Set DOCKERHUB_USERNAME in .env before starting.
 services:
   app:
-    image: ${DOCKERHUB_USERNAME:?Set DOCKERHUB_USERNAME in .env}/txt2latex:${IMAGE_TAG:-latest}
-    env_file: .env
+    image: charley008/txt2latex:latest
     ports:
-      - "${WEB_PORT:-8080}:3000"
+      - "8080:3000"
     restart: unless-stopped
     init: true
     healthcheck:
