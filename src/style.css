@@ -85,3 +85,13 @@
 [data-theme="dark"] .workspace-resizer span{background:#7f956c}
 [data-theme="dark"] .workspace-resizer:hover,[data-theme="dark"] .workspace-resizer:focus-visible{background:#37482d}
 @media(max-width:620px){.workspace>.input-pane{height:calc(var(--editor-height,330px) * .65)}.workspace>.output-pane{height:calc(var(--editor-height,330px) * .65)}}
+
+/* Dark mode keeps text neutral and bright; green is reserved for accents. */
+:root[data-theme="dark"]{color:#f0f3ef}
+[data-theme="dark"] .description,[data-theme="dark"] .preview,[data-theme="dark"] .source textarea,[data-theme="dark"] .modal input,[data-theme="dark"] .modal textarea{color:#f1f5ef}
+[data-theme="dark"] .hero p,[data-theme="dark"] .section-label,[data-theme="dark"] .engine-bar,[data-theme="dark"] .source-heading,[data-theme="dark"] .modal>p,[data-theme="dark"] .modal small,[data-theme="dark"] .model-badge,[data-theme="dark"] .input-meta,[data-theme="dark"] .output-actions,[data-theme="dark"] footer,[data-theme="dark"] .muted,[data-theme="dark"] .convert-bar>span,[data-theme="dark"] .preview p{color:#c2cbc1}
+[data-theme="dark"] .description::placeholder,[data-theme="dark"] .source textarea::placeholder{color:#b4bfb2;opacity:1}
+[data-theme="dark"] .sample-math{color:#d1ddc7}
+[data-theme="dark"] .outline,[data-theme="dark"] select,[data-theme="dark"] .example-grid button,[data-theme="dark"] .history-items button{color:#e9eee5}
+[data-theme="dark"] .example-grid small,[data-theme="dark"] .example-grid button>svg,[data-theme="dark"] .section-label>button,[data-theme="dark"] .footer-logo,[data-theme="dark"] .brand b>span,[data-theme="dark"] .line-no,[data-theme="dark"] .icon-button{color:#bcc9b5}
+[data-theme="dark"] .live,[data-theme="dark"] .eyebrow,[data-theme="dark"] .step{color:#bbd39f}
