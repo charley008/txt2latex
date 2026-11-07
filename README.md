@@ -10,7 +10,7 @@ Copy-Item .env.example .env
 docker compose up -d --build
 ```
 
-Linux / WSL 下第一步用 `cp .env.example .env`。访问 http://localhost:8080 。修改端口设置 `WEB_PORT`，AI 地址、模型和 Key 在各自浏览器的接口设置中填写。地址填写到 `/v1` 或提供商要求的基础路径，不要包含 `/chat/completions`。修改环境变量后运行 `docker compose up -d`。
+Linux / WSL 下第一步用 `cp .env.example .env`。访问 http://localhost:8080 。修改端口设置 `WEB_PORT`，AI 地址、模型和 Key 在各自浏览器的接口设置中填写。支持提供商的基础地址或完整 `/chat/completions` 路径。修改环境变量后运行 `docker compose up -d`。
 
 ```powershell
 docker compose logs -f
