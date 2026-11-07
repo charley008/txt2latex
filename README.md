@@ -52,7 +52,7 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-访问 http://localhost:5173 。不需要 API 后端。生产构建 `npm.cmd run build`，随后 `npm.cmd start` 在 3000 提供静态网页。测试 `npm.cmd test` 覆盖本地模型生命周期、个人密钥保存规则、云端直连协议及共享 API 移除；真实模型质量与云端 CORS 仍需在目标浏览器验证。
+开发和生产均访问 http://localhost:3000 。开发运行 `npm.cmd run dev`；生产先运行 `npm.cmd run build`，再运行 `npm.cmd start`。两种模式任选一种启动，不要同时运行。端口被占用时开发服务会报错，不会自动切换端口。测试运行 `npm.cmd test`。Docker 默认对外映射为 8080，容器内部仍为 3000。
 
 ## 特别鸣谢
 
