@@ -7,7 +7,8 @@ services:
     network_mode: bridge
     init: true
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      start_period: 5s
       interval: 30s
       timeout: 5s
       retries: 3

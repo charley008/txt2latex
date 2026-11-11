@@ -2,7 +2,7 @@
 
 本程序由 CODEX + GPT-6.1SOL 开发。
 
-将中文、英文自然语言转为 LaTeX 的独立网站。React + KaTeX 前端，Node.js 提供静态网页和健康检查，单个 Docker 容器部署。默认使用 Chrome 内置 Gemini Nano 在本机转换；也可自行配置 DeepSeek 等支持 OpenAI 兼容 Chat Completions 接口的服务，使用各自的 API Key。
+将中文、英文自然语言转为 LaTeX 的独立网站。React + KaTeX 前端，容器由 Nginx 提供静态网页和健康检查，单个 Docker 容器部署。默认使用 Chrome 内置 Gemini Nano 在本机转换；也可自行配置 DeepSeek 等支持 OpenAI 兼容 Chat Completions 接口的服务，使用各自的 API Key。
 
 ## Docker 部署
 
@@ -19,7 +19,32 @@ docker compose logs -f
 docker compose down
 ```
 
-容器内部监听 3000，默认映射到宿主机 8080。网页与 `/api/health` 健康检查由同一个 Node.js 服务提供，无需额外的 Nginx 容器。公式渲染资源随镜像构建，界面使用系统字体。
+容器内部监听 3000，默认映射到宿主机 8080。网页与 `/api/health` 健康检查由同一个 Nginx 服务提供，无需额外容器。公式渲染资源随镜像构建，界面使用系统字体。
+
+### 低内存运行
+
+Node.js 仅用于构建前端，最终镜像使用非 root 用户运行单 worker Nginx，不再常驻 Node.js，也不会每 30 秒启动 Node.js 做健康检查。AI 和公式渲染都在浏览器中运行，VPS 只提供静态文件。实际内存取决于访问量和 Docker 的统计方式，可在启动后查看：
+
+```sh
+docker compose stats --no-stream
+```
+
+WSL2 / Ubuntu、Docker linux/amd64 对比：两版均启用 `init`，各处理 500 次请求（10 并发），完成自动健康检查后，`docker stats` 显示旧 Node.js 容器约 38.73 MiB，新 Nginx 容器约 5.25 MiB，降低约 86%。这是本地对比结果，VPS 上需按相同统计口径复测；进程 RSS 与 `docker stats` 数字不同。
+
+从源码更新部署：
+
+```sh
+docker compose up -d --build
+```
+
+使用 `compose.hub.yaml` 的部署，需要等新版镜像发布后再更新，并使用新版 Compose 文件（健康检查已改为 `wget`）：
+
+```sh
+docker compose -f compose.hub.yaml pull
+docker compose -f compose.hub.yaml up -d
+```
+
+已有 Nginx 的用户，也可以直接托管 `npm run build` 生成的 `dist/`，省去本项目的独立容器。
 
 ### 接入你现有的 Nginx
 
@@ -74,7 +99,9 @@ npm.cmd ci
 npm.cmd run dev
 ```
 
-开发和生产均访问 http://localhost:3000 。开发运行 `npm.cmd run dev`；生产先运行 `npm.cmd run build`，再运行 `npm.cmd start`。两种模式任选一种启动，不要同时运行。端口被占用时开发服务会报错，不会自动切换端口。测试运行 `npm.cmd test`。Docker 默认对外映射为 8080，容器内部仍为 3000。
+开发和生产均访问 http://localhost:3000 。开发运行 `npm.cmd run dev`；本地生产预览先运行 `npm.cmd run build`，再运行 `npm.cmd start`（使用 Node.js；Docker 运行阶段使用 Nginx）。两种模式任选一种启动，不要同时运行。端口被占用时开发服务会报错，不会自动切换端口。测试运行 `npm.cmd test`。Docker 默认对外映射为 8080，容器内部仍为 3000。
+
+有 Docker 的环境可运行 `npm run test:container`，自动构建镜像并检查页面、JS/CSS、字体、API 响应、健康检查及非 root 用户；测试容器结束后自动删除。
 
 ## 特别鸣谢
 
